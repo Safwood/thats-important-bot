@@ -1,6 +1,14 @@
 const token = "";
-
 const webAppUrl = "";
+
+function setWebhook() {
+  const result = UrlFetchApp.fetch(
+    `https://api.telegram.org/bot${token}/setWebhook?url=${webAppUrl}`
+  );
+
+  console.log(result.getContentText());
+}
+
 const table = SpreadsheetApp.openById("");
 const debugPage = table.getSheetByName("Debug");
 const todosPage = table.getSheetByName("Todos");
@@ -26,6 +34,7 @@ const NOTIFICATION_DAY = "5";
 const NOTIFICATION_TIME = "6";
 const TODO_MARK = "9";
 const tableDayShift = 6;
+
 const weekDays = (lang) => {
   if (lang === "en") {
     return [
@@ -50,10 +59,9 @@ const weekDays = (lang) => {
 };
 
 const lang = "en";
+const chat_id = "1127224992";
 
 const content = {};
-
-const chat_id = "1127224992";
 
 const Dictionary = {
   ru: {
@@ -111,22 +119,6 @@ const mainKeyboard = (lang) => ({
   keyboard: keyboard(lang),
   resize_keyboard: true,
 });
-
-function getME() {
-  const result = UrlFetchApp.fetch(
-    `https://api.telegram.org/bot${token}/getMe`
-  );
-
-  console.log(result.getContentText());
-}
-
-function setWebhook() {
-  const result = UrlFetchApp.fetch(
-    `https://api.telegram.org/bot${token}/setWebhook?url=${webAppUrl}`
-  );
-
-  console.log(result.getContentText());
-}
 
 function doPost(e) {
   const content = JSON.parse(e.postData.contents);
@@ -371,10 +363,6 @@ const getInlineKeyboard = (id, isImportant, lang) => {
   return {
     inline_keyboard: [
       [
-        // {
-        //   text: isImportant ? 'Неважное' : 'Важное',
-        //   callback_data: `${isImportant ? UNIMPORTANT : IMPORTANT}_${id}`
-        // },
         {
           text: "Сделано",
           callback_data: `${DONE}_${id}`,
