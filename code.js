@@ -1,5 +1,6 @@
 const token = "";
 const webAppUrl = "";
+const table = SpreadsheetApp.openById("");
 
 function setWebhook() {
   const result = UrlFetchApp.fetch(
@@ -9,7 +10,6 @@ function setWebhook() {
   console.log(result.getContentText());
 }
 
-const table = SpreadsheetApp.openById("");
 const debugPage = table.getSheetByName("Debug");
 const todosPage = table.getSheetByName("Todos");
 const langPage = table.getSheetByName("Language");
@@ -57,11 +57,6 @@ const weekDays = (lang) => {
     "Воскресенье",
   ];
 };
-
-const lang = "en";
-const chat_id = "1127224992";
-
-const content = {};
 
 const Dictionary = {
   ru: {
@@ -120,6 +115,11 @@ const mainKeyboard = (lang) => ({
   resize_keyboard: true,
 });
 
+const lang = "en";
+const chat_id = "1127224992";
+
+const content = {};
+
 function doPost(e) {
   const content = JSON.parse(e.postData.contents);
   const query = content.callback_query;
@@ -145,8 +145,6 @@ function doPost(e) {
 
   if (inlineValues.length > 1) {
     const [type, id, day, time, name] = inlineValues;
-
-    console.log(type == TODO_MARK);
 
     if (type == IMPORTANT) {
       markAsImportant(id);
@@ -238,7 +236,7 @@ function doPost(e) {
   } else if (pureText === dictionary.allNotifications) {
     sendText(
       chat_id,
-      getNotificationsInfo(chat_id, id, lang) || "Список уведомлений пуст"
+      getNotificationsInfo(chat_id, null, lang) || "Список уведомлений пуст"
     );
 
     // Редактировать список
@@ -271,9 +269,9 @@ function doPost(e) {
   }
 }
 
-const getNotificationsInfo = (chat_id, id, lang) => {
+const getNotificationsInfo = (chat_id, taskId, lang) => {
   let todos = getAllTodosWithDays(chat_id);
-  if (id) todos = todos.filter((el) => el[1] == +id);
+  if (taskId) todos = todos.filter((el) => el[1] == +taskId);
 
   let text = "";
   todos.forEach((el) => {
