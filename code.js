@@ -34,6 +34,7 @@ const NOTIFICATION_DAY = "5";
 const NOTIFICATION_TIME = "6";
 const TODO_MARK = "9";
 const tableDayShift = 6;
+const maxTextLength = 30;
 
 const weekDays = (lang) => {
   if (lang === "en") {
@@ -70,6 +71,33 @@ const Dictionary = {
     language: "En-Ru",
     cleanAll: "Очистить все напоминания",
     everyDay: "Каждый день",
+    addNotification: "Добавить напоминание",
+    remove: "Удалить",
+    done: "Сделано",
+    markedImportant: "Задача помечена как 'Важная'",
+    markedUnimportant: "Задача помечена как 'Неважная'",
+    putToDone: "Задача перенесена в 'Выполненные'",
+    taskRemoved: "Задача успешно удалена",
+    taskSent: "Запрос отправлен",
+    chooseDay:
+      "Выберите день, в который хотите получать напоминание по этой задаче",
+    chooseTime: "Выберите время, во сколько должно приходить напоминание",
+    timeSet: "Время напоминания задано",
+    allNotificationsRemoved: "Все напоминания удалены",
+    hello: "Привет",
+    sendTaskToBot:
+      "Чтобы добавить новую задачу, отправьте боту название задачи. Максимально ",
+    symbols: "символа.",
+    emptyList: "Список уведомлений пуст",
+    chooseTask:
+      "Выберите задачу для редактирования. Для добавления новой задачи, просто отправьте боту название задачи",
+    taskAdded: "Новая задача успешно добавлена",
+    textLength: "Длина текста должна быть до ",
+    symbols2: "символов.",
+    textLength2: "Длина вашего текста ",
+    mustRemove: "Необходимо убрать ",
+    copyText: "Скопировать текст",
+    updatedLanguage: "Язык приложения обновлен",
   },
   en: {
     list: "Todos",
@@ -82,6 +110,31 @@ const Dictionary = {
     language: "En-Ru",
     cleanAll: "Clean all notifications",
     everyDay: "Every day",
+    addNotification: "Add notification",
+    remove: "Remove",
+    done: "Done",
+    markedImportant: "The task is marked as'Important'",
+    markedUnimportant: "The task is marked as 'Unimportant'",
+    putToDone: "The task is was moved to 'Done'",
+    taskRemoved: "The task is successfully removed",
+    taskSent: "The request is sent",
+    chooseDay: "Choose the day to get notifications for this task",
+    chooseTime: "Choose the time when notifications must come",
+    timeSet: "The time is set",
+    allNotificationsRemoved: "All notifications are removed",
+    hello: "Hello",
+    sendTaskToBot: "To add a new task, send it to the bot. Maximum ",
+    symbols: "symbols.",
+    emptyList: "The notifications list is empty",
+    chooseTask:
+      "Choose the task to edit. To add a new task, just send it to the bot",
+    taskAdded: "A new task was successfully added",
+    textLength: "The length of your text must be up to ",
+    symbols2: "symbols.",
+    textLength2: "The length of your text is ",
+    mustRemove: "It's necessary to remove ",
+    copyText: "Copy the text",
+    updatedLanguage: "The language was updated",
   },
 };
 
@@ -148,49 +201,39 @@ function doPost(e) {
 
     if (type == IMPORTANT) {
       markAsImportant(id);
-      if (queryId)
-        sendKeyboardCallback(queryId, "Задача помечена как 'Важная'");
+      if (queryId) sendKeyboardCallback(queryId, dictionary.markAsImportant);
       sendKeyboard(chat_id, dictionary.updatedTask, mainKeyboard(lang));
     } else if (type == UNIMPORTANT) {
       markAsUnimportant(id);
-      if (queryId)
-        sendKeyboardCallback(queryId, "Задача помечена как 'Неважная'");
+      if (queryId) sendKeyboardCallback(queryId, dictionary.markAsUnimportant);
       sendKeyboard(chat_id, dictionary.updatedTask, mainKeyboard(lang));
     } else if (type == DONE) {
       markAsDone(id);
-      if (queryId)
-        sendKeyboardCallback(queryId, "Задача перенесена в 'Выполненные'");
+      if (queryId) sendKeyboardCallback(queryId, dictionary.putToDone);
       sendKeyboard(chat_id, dictionary.updatedTask, mainKeyboard(lang));
     } else if (type == DELETE) {
       markAsDeleted(id);
-      if (queryId) sendKeyboardCallback(queryId, "Задача успешно удалена");
+      if (queryId) sendKeyboardCallback(queryId, dictionary.taskRemoved);
       sendKeyboard(chat_id, dictionary.updatedTask, mainKeyboard(lang));
     } else if (type == NOTIFICATION_DAY) {
-      if (queryId) sendKeyboardCallback(queryId, "Запрос отправлен");
-      sendKeyboard(
-        chat_id,
-        "Выберите день, в который хотите получать напоминание по этой задаче",
-        getDayKeyboard(id, lang)
-      );
+      if (queryId) sendKeyboardCallback(queryId, dictionary.taskSent);
+      sendKeyboard(chat_id, dictionary.chooseDay, getDayKeyboard(id, lang));
     }
     // Каждый день
     else if (weekDays(lang).includes(type) || type === dictionary.everyDay) {
-      if (queryId) sendKeyboardCallback(queryId, "Запрос отправлен");
-      sendKeyboard(
-        chat_id,
-        "Выберите время, во сколько должно приходить напоминание",
-        getTimeKeyboard(id, type)
-      );
+      if (queryId) sendKeyboardCallback(queryId, dictionary.taskSent);
+      sendKeyboard(chat_id, dictionary.chooseTime, getTimeKeyboard(id, type));
     } else if (type === "day") {
       if (time && day) setTimer(id, day, time, lang);
-      if (queryId) sendKeyboardCallback(queryId, "Время напоминания задано");
+      if (queryId) sendKeyboardCallback(queryId, dictionary.timeSet);
     }
     // Очистить все
     else if (type == dictionary.cleanAll) {
       cleanTimers(id);
-      if (queryId) sendKeyboardCallback(queryId, "Все напоминания удалены");
+      if (queryId)
+        sendKeyboardCallback(queryId, dictionary.allNotificationsRemoved);
     } else if (type == TODO_MARK) {
-      if (queryId) sendKeyboardCallback(queryId, "Запрос отправлен");
+      if (queryId) sendKeyboardCallback(queryId, dictionary.taskSent);
       const values = todosPage
         .getRange(startRow, 1, allRows, 1)
         .getValues()
@@ -214,7 +257,7 @@ function doPost(e) {
     langPage.getRange(langLastRow + 1, 2).setValue("ru");
     sendKeyboard(
       chat_id,
-      `Привет, ${name}! Чтобы добавить новую задачу,отправить боту название задачи. Максимально 33 символа.`,
+      `${dictionary.hello}, ${name}! ${dictionary.sendTaskToBot} ${maxTextLength} ${dictionary.symbols}.`,
       mainKeyboard(lang)
     );
     // Главное меню, Меню обновлено
@@ -227,42 +270,40 @@ function doPost(e) {
     // Список дел
   } else if (pureText === dictionary.list) {
     const todos = getAllTodos(chat_id, true).join("\n");
-    sendKeyboard(chat_id, todos, getEditKeyboard());
+    sendKeyboard(chat_id, todos, getEditKeyboard(lang));
     // Язык
   } else if (pureText === dictionary.language) {
     const newLang = changeLanguage(chat_id);
-    sendKeyboard(chat_id, "Язык приложения обновлен", mainKeyboard(newLang));
+    sendKeyboard(chat_id, dictionary.updatedLanguage, mainKeyboard(newLang));
     // Все уведомления
   } else if (pureText === dictionary.allNotifications) {
     sendText(
       chat_id,
-      getNotificationsInfo(chat_id, null, lang) || "Список уведомлений пуст"
+      getNotificationsInfo(chat_id, null, lang) || dictionary.emptyList
     );
 
     // Редактировать список
   } else if (pureText === dictionary.editList) {
-    if (queryId) sendKeyboardCallback(queryId, "Запрос отправлен");
-    sendKeyboard(
-      chat_id,
-      "Выберите задачу для редактирования. Для добавления новой задачи, просто отправьте боту название задачи. Максимально 33 символа.",
-      getTodosKeyboard(chat_id)
-    );
+    if (queryId) sendKeyboardCallback(queryId, dictionary.taskSent);
+    sendKeyboard(chat_id, dictionary.chooseTask, getTodosKeyboard(chat_id));
   } else {
-    if (pureText.length <= 33) {
+    if (pureText.length <= maxTextLength) {
       todosPage.getRange(todosLastRow + 1, 1).setValue(pureText);
       todosPage
         .getRange(todosLastRow + 1, 2)
         .setValue(Math.round(Math.random() * 1000000));
       todosPage.getRange(todosLastRow + 1, 3).setValue(chat_id);
-      sendText(chat_id, "Новая задача успешно добавлена", false);
+      sendText(chat_id, dictionary.taskAdded, false);
     } else {
       const textLength = pureText.length;
-      const left = 33 - textLength;
+      const left = maxTextLength - textLength;
       sendText(
         chat_id,
-        `Длина текста должна быть до 33 символов.\nДлина вашего текса ${textLength}\nНеобходимо убрать ${Math.abs(
-          left
-        )}\n<u>Скопировать текст</u>\n<code>${pureText}</code>`,
+        `${dictionary.textLength} ${maxTextLength} ${dictionary.symbols2}.\n${
+          dictionary.textLength2
+        } ${textLength}\n${dictionary.mustRemove} ${Math.abs(left)}\n<u>${
+          dictionary.copyText
+        }</u>\n<code>${pureText}</code>`,
         false
       );
     }
@@ -362,17 +403,17 @@ const getInlineKeyboard = (id, isImportant, lang) => {
     inline_keyboard: [
       [
         {
-          text: "Сделано",
+          text: dictionary.done,
           callback_data: `${DONE}_${id}`,
         },
         {
-          text: "Удалить",
+          text: dictionary.remove,
           callback_data: `${DELETE}_${id}`,
         },
       ],
       [
         {
-          text: "Добавить напоминание",
+          text: dictionary.addNotification,
           callback_data: `${NOTIFICATION_DAY}_${id}`,
         },
         {
@@ -385,13 +426,14 @@ const getInlineKeyboard = (id, isImportant, lang) => {
   };
 };
 
-const getEditKeyboard = () => {
+const getEditKeyboard = (lang) => {
+  const dictionary = Dictionary[lang];
   return {
     inline_keyboard: [
       [
         {
-          text: "Редактировать список",
-          callback_data: "Редактировать список",
+          text: dictionary.editList,
+          callback_data: dictionary.editList,
         },
       ],
     ],
