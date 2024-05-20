@@ -1,9 +1,7 @@
-const token = "7053208106:AAEgrd9PJb64B7n0dhf_abR2y7s5y8EVVcs";
-const webAppUrl =
-  "https://script.google.com/macros/s/AKfycbyymFqkufPo9qBbvbJ30hhgWMtzLysWmxbZ1gJkpFhL3P3HPCSbALfdV_dxvwIB98dJAw/exec";
-const table = SpreadsheetApp.openById(
-  "1SHvHb-TB98w0Xp6uJVKtYsRExMVG5oczLOGzplRKyx4"
-);
+const token = "";
+
+const webAppUrl = "";
+const table = SpreadsheetApp.openById("");
 const debugPage = table.getSheetByName("Debug");
 const todosPage = table.getSheetByName("Todos");
 const langPage = table.getSheetByName("Language");
