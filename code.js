@@ -35,6 +35,7 @@ const NOTIFICATION_TIME = "6";
 const TODO_MARK = "9";
 const tableDayShift = 6;
 const maxTextLength = 30;
+const totalMaxTextLength = 45;
 
 const weekDays = (lang) => {
   if (lang === "en") {
@@ -64,7 +65,7 @@ const Dictionary = {
     list: "Список дел",
     updateMenu: "Обновить меню",
     editList: "Редактировать список",
-    allNotifications: "Все уведомления",
+    allNotifications: "Все напоминания",
     main: "Главное меню",
     updatedMainMenu: "Главное меню обновлено",
     updatedTask: "Задача обновлена",
@@ -144,9 +145,6 @@ const keyboard = (lang) => {
     [
       {
         text: "🔶 " + dictionary.list,
-      },
-      {
-        text: "🔶 " + dictionary.updateMenu,
       },
       {
         text: "🔶 " + dictionary.editList,
@@ -275,7 +273,7 @@ function doPost(e) {
   } else if (pureText === dictionary.language) {
     const newLang = changeLanguage(chat_id);
     sendKeyboard(chat_id, dictionary.updatedLanguage, mainKeyboard(newLang));
-    // Все уведомления
+    // Все напоминания
   } else if (pureText === dictionary.allNotifications) {
     sendText(
       chat_id,
@@ -291,7 +289,7 @@ function doPost(e) {
       todosPage.getRange(todosLastRow + 1, 1).setValue(pureText);
       todosPage
         .getRange(todosLastRow + 1, 2)
-        .setValue(Math.round(Math.random() * 1000000));
+        .setValue(Math.round(Math.random() * 1000000)); // 6 символов
       todosPage.getRange(todosLastRow + 1, 3).setValue(chat_id);
       sendText(chat_id, dictionary.taskAdded, false);
     } else {
@@ -374,7 +372,7 @@ const getTodosKeyboard = (chat_id) => {
   todos.forEach(({ text, id }) => {
     row.push({
       text,
-      callback_data: `${TODO_MARK}_${id}_0_0_${text}`,
+      callback_data: `${TODO_MARK}_${id}_0_0_${text}`, //5 + 6 id + 2 нуля + текст (32) totalMaxTextLength = 45
     });
     count++;
 
